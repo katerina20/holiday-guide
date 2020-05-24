@@ -1,5 +1,9 @@
 package main
 
-func main() {
+import (
+	"./holiday"
+)
 
+func main() {
+	holiday.InfoHoliday()
 }
