@@ -2,15 +2,22 @@ package http
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"time"
 )
 
-func RequestApi() {
-	resp, err := http.Get("https://date.nager.at/api/v2/publicholidays/2020/UA")
+const timoutSec = 5
+
+var clientConf = &http.Client{Timeout: timoutSec * time.Second}
+
+func RequestApi(url string) []byte {
+	r, err := clientConf.Get(url)
 	if err != nil {
 		fmt.Println(err)
-		return
 	}
+	defer r.Body.Close()
 
-	defer resp.Body.Close()
+	content, _ := ioutil.ReadAll(r.Body)
+	return content
 }
