@@ -8,12 +8,16 @@ import (
 
 const countryCode = "UA"
 const apiURL = "https://date.nager.at/api/v2/publicholidays/%v/%v"
-const weekendApiURL = "https://date.nager.at/Api/v2/LongWeekend/%v/%v"
 const stringInfo = "\n%v holiday is %v, %v %v"
-const weekendString = "The weekend will last %v days: %v %v - %v %v"
+const weekendString = "The weekend will last 3 days: %v %v - %v %v"
 
 const stringNext = "The next"
 const stringToday = "Today's"
+
+const fridayStr = "Friday"
+const saturdayStr = "Saturday"
+const sundayStr = "Sunday"
+const mondayStr = "Monday"
 
 //var currentTime = StringToDate("2020-05-01")
 var currentTime = time.Now()
@@ -59,26 +63,25 @@ func printInfo(holiday Holiday, isToday bool) {
 }
 
 func checkWeekend(holiday Holiday) {
-	var isHolidayAfterStart, isHolidayBeforeEnd bool
 	var holidayDate = StringToDate(holiday.Date)
+	var weekDay = holidayDate.Weekday().String()
 
-	var weekends = parseWeekendFromJson(http.RequestApi(
-		fmt.Sprintf(weekendApiURL, currYear(), countryCode)))
+	var startDate time.Time
+	var endDate time.Time
 
-	for _, weekend := range weekends {
-		isHolidayAfterStart = holidayDate.After(StringToDate(weekend.StartDate)) ||
-			holidayDate.Equal(StringToDate(weekend.StartDate))
-		isHolidayBeforeEnd = holidayDate.Before(StringToDate(weekend.EndDate)) ||
-			holidayDate.Equal(StringToDate(weekend.EndDate))
-
-		if isHolidayAfterStart && isHolidayBeforeEnd {
-			fmt.Printf(weekendString,
-				weekend.DayCount,
-				StringToDate(weekend.StartDate).Month(),
-				StringToDate(weekend.StartDate).Day(),
-				StringToDate(weekend.EndDate).Month(),
-				StringToDate(weekend.EndDate).Day())
-			return
-		}
+	switch weekDay {
+	case fridayStr, saturdayStr:
+		startDate = holidayDate
+		endDate = holidayDate.AddDate(0, 0, 2)
+	case sundayStr:
+		startDate = holidayDate.AddDate(0, 0, -1)
+		endDate = holidayDate.AddDate(0, 0, 1)
+	case mondayStr:
+		startDate = holidayDate.AddDate(0, 0, -2)
+		endDate = holidayDate
+	default:
+		return
 	}
+
+	fmt.Printf(weekendString, startDate.Month(), startDate.Day(), endDate.Month(), endDate.Day())
 }

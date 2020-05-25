@@ -13,12 +13,3 @@ func parseHolidayFromJson(content []byte) []Holiday {
 	}
 	return holidays
 }
-
-func parseWeekendFromJson(content []byte) []Weekend {
-	var weekends []Weekend
-	var err = json.Unmarshal(content, &weekends)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return weekends
-}
